@@ -1,13 +1,14 @@
 /* eslint-disable camelcase */
 import jwt from 'jsonwebtoken';
 import env from 'dotenv';
+import bcrypt from 'bcrypt';
 import { Users } from '../../../sequelizeDB/models';
 
 env.config();
 
 class SocialAuthController {
   /* function that creates the user */
-  static facebookSignup(user, done) {
+  static socialAuthSignup(user, done) {
     Users.findOrCreate({
       where: {
         email: user.email,
@@ -18,7 +19,7 @@ class SocialAuthController {
         id, email, first_name, last_name, user_type, is_admin,
       } = foundOrCreated.dataValues;
       done(null, {
-        email, id, first_name, last_name, user_type, is_admin,
+        email, id, created, first_name, last_name, user_type, is_admin,
       });
     });
   }
@@ -34,7 +35,7 @@ class SocialAuthController {
       is_Admin: false,
     };
     user.token = jwt.sign({ id: user.id, email: user.email }, process.env.SECRET, { expiresIn: '24h' });
-    if (req.user.email) {
+    if (req.user.created) {
       return res.status(201).send({
         status: 201,
         message: 'Signup was successful',
@@ -50,15 +51,16 @@ class SocialAuthController {
 
   /* so this is called from passport.js */
   static passportCallback(accessToken, refreshToken, profile, done) {console.log(profile);
+    const hashedPassword = bcrypt.hashSync(profile.id, bcrypt.genSaltSync(8));
     const userProfile = {
       first_name: profile.name.familyName,
       last_name: profile.name.givenName,
       email: profile.emails[0].value,
-      password: '123456',
+      password: hashedPassword,
       user_type: 'client',
       is_admin: false,
     };
-    SocialAuthController.facebookSignup(userProfile, done);
+    SocialAuthController.socialAuthSignup(userProfile, done);
   }
 }
 

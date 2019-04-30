@@ -12,4 +12,8 @@ user.post('/login', userController.login);
 user.get('/facebook', passport.authenticate('facebook', { scope: ['public_profile', 'email'] }));
 // handle the callback after facebook has authenticated the user
 user.get('/facebook/callback', passport.authenticate('facebook', { session: false }), socialAuthController.response);
+// route for google
+user.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+// route for google call back
+user.get('/google/callback', passport.authenticate('google', { session: false }), socialAuthController.response);
 export default user;

@@ -50,7 +50,7 @@ class SocialAuthController {
   }
 
   /* so this is called from passport.js */
-  static passportCallback(accessToken, refreshToken, profile, done) {console.log(profile);
+  static passportCallback(accessToken, refreshToken, profile, done) {
     const hashedPassword = bcrypt.hashSync(profile.id, bcrypt.genSaltSync(8));
     const userProfile = {
       first_name: profile.name.familyName,

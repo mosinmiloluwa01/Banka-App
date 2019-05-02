@@ -38,6 +38,10 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'user_id',
       as: 'cashier',
     });
+    Users.hasMany(models.Requests, {
+      foreignKey: 'user_id',
+      as: 'requester',
+    });
   };
   return Users;
 };
